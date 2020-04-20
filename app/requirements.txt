@@ -1,0 +1,4 @@
+fastapi
+python-multipart
+boto3
+kafka-python
