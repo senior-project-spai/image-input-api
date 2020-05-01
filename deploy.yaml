@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: image-input-api
+  name: image-input-api
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: image-input-api
+  template:
+    metadata:
+      labels:
+        app: image-input-api
+        deploymentconfig: image-input-api
+    spec:
+      containers:
+        - env:
+            - name: KAFKA_TOPIC_OBJECT_IMAGE
+              valueFrom:
+                configMapKeyRef:
+                  key: KAFKA_TOPIC_OBJECT_IMAGE_INPUT
+                  name: kafka-topic
+            - name: S3_BUCKET_OBJECT
+              value: object-image
+          envFrom:
+            - configMapRef:
+                name: kafka-endpoint
+            - configMapRef:
+                name: s3-endpoint
+            - configMapRef:
+                name: s3-key
+          image: supakornbabe/spai-image-input-api:dev-3dd6c7a
+          imagePullPolicy: Always
+          name: image-input-api
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: image-input-api
+  name: image-input-api
+spec:
+  ports:
+    - name: 80-tcp
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: image-input-api
+  type: ClusterIP
