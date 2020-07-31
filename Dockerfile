@@ -1,7 +1,7 @@
-FROM tiangolo/uvicorn-gunicorn:python3.7-alpine3.8
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7-alpine3.8
 
-LABEL maintainer=
+# Install python package first
+COPY ./requirements.txt /.
+RUN pip install -r /requirements.txt
 
 COPY ./app /app
-
-RUN pip install -r /app/requirements.txt
