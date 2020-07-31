@@ -3,7 +3,7 @@ import boto3
 from botocore import UNSIGNED
 from botocore.client import Config
 
-from .config import S3_ENDPOINT, S3_ACCESS_KEY, S3_SECRET_KEY, S3_BUCKET_OBJECT
+from app.config import S3_ENDPOINT, S3_ACCESS_KEY, S3_SECRET_KEY, S3_BUCKET_OBJECT
 
 def upload_fileobj(file, file_name, bucket_name):
     s3_resource = boto3.resource('s3',
