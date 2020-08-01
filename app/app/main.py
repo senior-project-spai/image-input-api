@@ -3,51 +3,31 @@ from fastapi import FastAPI, APIRouter, File, Form, UploadFile, BackgroundTasks
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import Response
 from pydantic import BaseModel
-
 # Kafka
-from kafka import KafkaProducer
 from json import dumps
-
-# logger
-from app.logger import logger
-
-# config
-from app.config import KAFKA_HOST, KAFKA_PORT, S3_BUCKET_OBJECT_IMAGE, KAFKA_TOPIC_OBJECT_IMAGE, S3_BUCKET_FACE_IMAGE, KAFKA_TOPIC_FACE_IMAGE, MYSQL_CONFIG
-
 # SQL
 import pymysql
-
 # import time
 import time as time1
 
+# logger
+from app.logger import logger
 # S3
 from app.s3 import upload_fileobj
+# kafka
+from app.kafka import kafka_producer
+# router
+from app.routes import object
+# config
+from app.config import S3_BUCKET_FACE_IMAGE, KAFKA_TOPIC_FACE_IMAGE, MYSQL_CONFIG
 
-# Kafka Producer client
-kafka_producer = KafkaProducer(bootstrap_servers=f"{KAFKA_HOST}:{KAFKA_PORT}")
-
-# initialize FastAPI
+# Initialize FastAPI
 app = FastAPI()
 
 # TODO: change allow_origins
 app.add_middleware(CORSMiddleware, allow_origins=['*'])
 
-
-@app.post("/_api/object", response_class=Response)
-def object_image_input(image: UploadFile = File(...),  # ... = required
-                       image_name: str = Form(...),
-                       time: int = Form(...)):  # epoch (seconds)
-
-    # Upload image to S3
-    upload_fileobj(image.file, image_name, S3_BUCKET_OBJECT_IMAGE)
-    image_s3_uri = f"s3://{S3_BUCKET_OBJECT_IMAGE}/{image_name}"
-    logger.info(f"Image is uploaded to {image_s3_uri}")
-
-    # Send data to Kafka
-    message = {'image_path': image_s3_uri}
-    kafka_producer.send(KAFKA_TOPIC_OBJECT_IMAGE,
-                        value=dumps(message).encode(encoding='UTF-8'))
-    logger.info(f"Message is published to Kafka: {dumps(message)}")
+app.include_router(object.router, prefix="/_api/object", tags=["object"])
 
 
 class FaceImageInputResponseModel(BaseModel):
