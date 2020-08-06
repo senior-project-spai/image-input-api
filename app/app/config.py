@@ -20,3 +20,8 @@ MYSQL_CONFIG = {
     "passwd": os.getenv('MYSQL_MASTER_PASS'),
     "db": os.getenv('MYSQL_MASTER_DB')
 }
+
+MYSQL_CONFIG_FADE = {
+    **MYSQL_CONFIG,
+    "db": 'face_recognition'
+}
