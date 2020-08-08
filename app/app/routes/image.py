@@ -15,7 +15,7 @@ from app import main, config
 router = APIRouter()
 
 
-@router.post("/", response_class=Response)
+@router.post("/")
 def object_image_input(image: UploadFile = File(...),  # ... = required
                        image_id: str = Form(None)): # Optional
 
