@@ -66,3 +66,5 @@ def object_image_input(image: UploadFile = File(...),  # ... = required
     main.kafka_producer.send(config.KAFKA_TOPIC_IMAGE,
                              value=dumps(message).encode(encoding='UTF-8'))
     logger.info(f"Message is published to Kafka: {dumps(message)}")
+
+    return {'image_id': image_id}
